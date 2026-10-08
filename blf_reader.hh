@@ -33,6 +33,31 @@ auto read_blf_struct(const struct lobj &indata, type_data &blf_struct_data) -> s
 
 
 /**
+ * @brief Reads a variable-length CAN_FD_MESSAGE_64 object
+ *
+ * @param indata incoming lobj frame of type CAN_FD_MESSAGE_64
+ * @param header var parameter for the fixed part of the object
+ * @param data var parameter for the payload; header.validDataBytes are valid
+ * @return true if the fixed part and all valid data bytes were present
+ */
+inline auto read_can_fd_message_64(const struct lobj &indata,
+    blf_struct::CanFdMessage64_obh &header,
+    std::array<uint8_t, 64> &data) -> bool
+{
+    if (read_blf_struct(indata, header) == 0 || header.validDataBytes > data.size())
+        {
+            return false;
+        }
+    if (indata.payload.size() < sizeof(header) + header.validDataBytes)
+        {
+            return false;
+        }
+    std::memcpy(data.data(), indata.payload.data() + sizeof(header), header.validDataBytes);
+    return true;
+}
+
+
+/**
  * @brief blf_reader class
  *
  */

@@ -55,3 +55,7 @@ target_link_libraries(read_can PRIVATE ZLIB::ZLIB )
 
 add_executable(read_filestatistics read_filestatistics.cc print.cc blf_reader.cc)
 target_link_libraries(read_filestatistics PRIVATE ZLIB::ZLIB )
+
+enable_testing()
+add_executable(test_can_fd test_can_fd.cc)
+add_test(NAME can_fd COMMAND test_can_fd)

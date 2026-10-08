@@ -576,6 +576,56 @@ namespace blf_struct
         uint32_t mOverloadFrames {0};       /* CAN overload frames */
     };
 
+
+    // CAN_FD_MESSAGE (100). Fixed size: the data array is always 64 bytes,
+    // of which validDataBytes are meaningful.
+    struct CanFdMessage_obh
+    {
+        ObjectHeader obh;
+        uint16_t channel {0};
+        uint8_t flags {0};          // CAN_MSG_DIR / CAN_MSG_RTR, as for CAN_MESSAGE
+        uint8_t dlc {0};
+        uint32_t id {0};            // bit 31 set for extended IDs
+        uint32_t frameLength {0};
+        uint8_t arbBitCount {0};
+        uint8_t canFdFlags {0};     // CAN_FD_MSG_EDL / CAN_FD_MSG_BRS / CAN_FD_MSG_ESI
+        uint8_t validDataBytes {0};
+        uint8_t reservedCanFdMessage1 {0};
+        uint32_t reservedCanFdMessage2 {0};
+        std::array<uint8_t, 64> data {};
+    };
+
+
+    // Flag bits of CanFdMessage64_obh::flags.
+    constexpr uint32_t CAN_FD_MSG64_RTR = 0x0010U;
+    constexpr uint32_t CAN_FD_MSG64_EDL = 0x1000U;
+    constexpr uint32_t CAN_FD_MSG64_BRS = 0x2000U;
+    constexpr uint32_t CAN_FD_MSG64_ESI = 0x4000U;
+
+
+    // CAN_FD_MESSAGE_64 (101), fixed part only. In the payload it is followed
+    // by validDataBytes data bytes and optional extension data, so the object
+    // is variable-length; read it with read_can_fd_message_64().
+    struct CanFdMessage64_obh
+    {
+        ObjectHeader obh;
+        uint8_t channel {0};
+        uint8_t dlc {0};
+        uint8_t validDataBytes {0};
+        uint8_t txCount {0};
+        uint32_t id {0};            // bit 31 set for extended IDs
+        uint32_t frameLength {0};
+        uint32_t flags {0};         // CAN_FD_MSG64_*
+        uint32_t btrCfgArb {0};
+        uint32_t btrCfgData {0};
+        uint32_t timeOffsetBrsNs {0};
+        uint32_t timeOffsetCrcDelNs {0};
+        uint16_t bitCount {0};
+        uint8_t dir {0};            // 0 = Rx, 1 = Tx
+        uint8_t extDataOffset {0};
+        uint32_t crc {0};
+    };
+
 #pragma pack()
 
 } // namespace blf_struct
